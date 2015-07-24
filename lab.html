@@ -1,0 +1,81 @@
+<html>
+<head>
+<!--<meta http-equiv="refresh" content="600">-->
+<!--CSS-->
+	<link href="style.css" rel='stylesheet' type='text/css' />
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+ google.load('visualization', '1.0', {'packages':['controls','table']});
+google.setOnLoadCallback(drawChart);
+function drawChart() {
+  var query = new google.visualization.Query(
+      'https://docs.google.com/a/uit.ac.in/spreadsheets/d/1RLst9_AnEGIIz1pUEs4H8qu6LOPbL7sUoSyppnS2vNI/edit?usp=sharing');
+  query.send(handleQueryResponse);
+
+}
+
+function handleQueryResponse(response) {
+  if (response.isError()) {
+    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+    return;
+  }
+ 
+
+  var data = response.getDataTable();
+   var dashboard = new google.visualization.Dashboard(
+            document.getElementById('dashboard_div'));
+
+        // Create a range slider, passing some options
+        var donutRangeSlider = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'filter_div',
+          'options': {
+            'filterColumnLabel': 'Name'
+          }
+        });
+
+        // Create a pie chart, passing some options
+        var pieChart = new google.visualization.ChartWrapper({
+          'chartType': 'Table',
+          'containerId': 'tab',
+          'options': {
+            'pieSliceText': 'value',
+            'legend': 'right'
+			
+          }
+        });
+		var date = new google.visualization.ControlWrapper({
+          'controlType': 'DateRangeFilter',
+          'containerId': 'filter_date',
+          'options': {
+            'filterColumnLabel': 'Timestamp'
+          }
+        });
+        // Establish dependencies, declaring that 'filter' drives 'pieChart',
+        // so that the pie chart will only display entries that are let through
+        // given the chosen slider range.
+        dashboard.bind([donutRangeSlider,date], pieChart);
+
+        // Draw the dashboard.
+		var StyleRows = {tableRow: 'StyleRows'} ;
+        dashboard.draw(data,{allowHtml: true,alternatingRowStyle: false,height : 500,width: 728,cssClassNames: StyleRows});
+      }
+    </script>
+
+<title>Data from a Spreadsheet</title>
+</head>
+
+<body>
+<header>
+<div id="logo"></div>
+<div><img src="college.jpg" />
+</header>
+ <div id="dashboard_div">
+      <!--Divs that will hold each control and chart-->
+	  <br>
+      <center><div id="filter_div"></div> <br> <div id="filter_date"></div> </center>
+	  <br>
+      <div id="tab"></div>
+    </div>
+  </body>
+</html>
